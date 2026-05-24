@@ -78,7 +78,7 @@ def patient_add(request):
                 blood_group    = request.POST.get('blood_group', ''),
                 address        = request.POST.get('address', ''),
                 city           = request.POST.get('city', ''),
-                country        = request.POST.get('country', 'USA'),
+                country        = request.POST.get('country', 'Maroc'),
                 state_province = request.POST.get('state_province', ''),
                 postal_code    = request.POST.get('postal_code', ''),
                 allergies      = request.POST.get('allergies', ''),
@@ -108,7 +108,7 @@ def patient_edit(request, pk):
             patient.blood_group    = request.POST.get('blood_group', '')
             patient.address        = request.POST.get('address', '')
             patient.city           = request.POST.get('city', '')
-            patient.country        = request.POST.get('country', 'USA')
+            patient.country        = request.POST.get('country', 'Maroc')
             patient.state_province = request.POST.get('state_province', '')
             patient.postal_code    = request.POST.get('postal_code', '')
             patient.allergies      = request.POST.get('allergies', '')
