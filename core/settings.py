@@ -8,8 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dentcare-dev-fallback-key-change-in-production')
 DEBUG      = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['dentcare.up.railway.app', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['https://dentcare.up.railway.app']
 # ─── Applications ─────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
