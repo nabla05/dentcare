@@ -1,7 +1,7 @@
 Django>=4.2,<5.0
 Pillow>=10.0
 xhtml2pdf==0.2.11
-reportlab==4.0.4
+reportlab==3.6.13
 pypdf==3.17.4
 lxml==4.9.3
 python-dotenv>=1.0
