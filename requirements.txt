@@ -6,3 +6,5 @@ pypdf>=3.0
 lxml>=4.9
 python-dotenv>=1.0
 requests>=2.31
+gunicorn>=21.2
+whitenoise>=6.6
