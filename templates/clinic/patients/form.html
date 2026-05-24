@@ -1,0 +1,130 @@
+{% extends "clinic/base.html" %}
+{% block title %}{{ action }} Patient{% endblock %}
+{% block topbar_title %}{{ action }} Patient{% endblock %}
+{% block nav_patients %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / <a href="{% url 'clinic:patient_list' %}">Patients</a> / {{ action }}</div>
+    <h1>{{ action }} Patient</h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:860px">
+  <div class="card-header"><span class="card-title">Patient Information</span></div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input type="text" name="first_name" value="{{ patient.first_name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Nom *</label>
+          <input type="text" name="last_name" value="{{ patient.last_name|default:'' }}" required>
+        </div>
+
+        {% if action == 'Add' %}
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <input type="password" name="confirm_password" required>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label>E-mail *</label>
+          <input type="email" name="email" value="{{ patient.email|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Téléphone *</label>
+          <input type="tel" name="phone" value="{{ patient.phone|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Date de Naissance</label>
+          <input type="date" name="date_of_birth" value="{{ patient.date_of_birth|date:'Y-m-d'|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label>Sexe</label>
+          <select name="gender">
+            <option value="">— Select —</option>
+            <option value="male"   {% if patient.gender == 'male' %}selected{% endif %}>Masculin</option>
+            <option value="female" {% if patient.gender == 'female' %}selected{% endif %}>Féminin</option>
+            <option value="other"  {% if patient.gender == 'other' %}selected{% endif %}>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Groupe Sanguin</label>
+          <select name="blood_group">
+            <option value="">— Select —</option>
+            {% for val, label in blood_groups %}
+            <option value="{{ val }}" {% if patient.blood_group == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="Active"   {% if patient.status == 'Active' %}selected{% endif %}>Active</option>
+            <option value="Inactive" {% if patient.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+          </select>
+        </div>
+
+        <div class="divider" style="grid-column:1/-1;margin:4px 0"></div>
+
+        <div class="form-group full">
+          <label>Adresse</label>
+          <input type="text" name="address" value="{{ patient.address|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label>Ville</label>
+          <input type="text" name="city" value="{{ patient.city|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label>State / Province</label>
+          <input type="text" name="state_province" value="{{ patient.state_province|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label>Code Postal</label>
+          <input type="text" name="postal_code" value="{{ patient.postal_code|default:'' }}">
+        </div>
+        <div class="form-group">
+          <label>Pays</label>
+          <input type="text" name="country" value="{{ patient.country|default:'USA' }}">
+        </div>
+
+        <div class="divider" style="grid-column:1/-1;margin:4px 0"></div>
+
+        <div class="form-group full">
+          <label>Allergies</label>
+          <textarea name="allergies">{{ patient.allergies|default:'' }}</textarea>
+        </div>
+        <div class="form-group full">
+          <label>Notes Médicales</label>
+          <textarea name="medical_notes">{{ patient.medical_notes|default:'' }}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Avatar / Photo</label>
+          <input type="file" name="avatar" accept="image/*">
+          {% if patient.avatar %}<div style="margin-top:6px"><img src="{{ patient.avatar.url }}" style="height:48px;border-radius:6px"></div>{% endif %}
+        </div>
+      </div>
+
+      <div class="flex-gap mt-16">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Patient</button>
+        <a href="{% url 'clinic:patient_list' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

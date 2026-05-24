@@ -1,0 +1,48 @@
+{% extends "clinic/base.html" %}
+{% block title %}Liste d'Attente{% endblock %}
+{% block topbar_title %}Liste d'Attente{% endblock %}
+{% block nav_waiting %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Liste d'Attente</div>
+    <h1>Liste d'Attente</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">{{ waiting_list|length }} patient{{ waiting_list|length|pluralize }} waiting</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Ref ID</th><th>Patient</th><th>Doctor</th><th>Requested Date</th><th>Time</th><th>Contact</th><th>Added</th></tr>
+      </thead>
+      <tbody>
+        {% for entry in waiting_list %}
+        <tr>
+          <td style="font-family:monospace;font-size:12px">{{ entry.appointment_ref|default:"—" }}</td>
+          <td>
+            {% if entry.patient %}
+            <a href="{% url 'clinic:patient_profile' pk=entry.patient.pk %}" style="color:var(--accent);text-decoration:none">{{ entry.patient.get_full_name }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>{% if entry.doctor %}Dr. {{ entry.doctor.user.last_name }}{% else %}—{% endif %}</td>
+          <td>{{ entry.date }}</td>
+          <td>{{ entry.time|time:"H:i" }}</td>
+          <td>
+            <div style="font-size:12px">{{ entry.email }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">{{ entry.phone }}</div>
+          </td>
+          <td style="white-space:nowrap;color:var(--text-muted);font-size:12px">{{ entry.added_at|timesince }} ago</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><i class="fas fa-clock"></i><p>No patients on the waiting list</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "clinic/base.html" %}
+{% block title %}View Rapport{% endblock %}
+{% block topbar_title %}View Rapport{% endblock %}
+{% block nav_patients %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:patient_profile' pk=rapport.patient.pk %}">{{ rapport.patient.get_full_name }}</a> / Rapport</div>
+    <h1>Medical Rapport</h1>
+  </div>
+  <a href="{% url 'clinic:patient_profile' pk=rapport.patient.pk %}" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="card">
+  <div class="card-body" style="padding:0">
+    <iframe src="{{ rapport.file.url }}" style="width:100%;height:80vh;border:none;border-radius:0 0 var(--radius) var(--radius)"></iframe>
+  </div>
+</div>
+{% endblock %}

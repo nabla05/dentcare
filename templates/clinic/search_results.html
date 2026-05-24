@@ -1,0 +1,122 @@
+{% extends "clinic/base.html" %}
+{% block title %}Search: {{ q }}{% endblock %}
+{% block topbar_title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Search</div>
+    <h1>
+      {% if q %}Results for "{{ q }}"
+      {% else %}Search{% endif %}
+    </h1>
+  </div>
+</div>
+
+<form method="get" action="{% url 'clinic:global_search' %}" style="margin-bottom:24px">
+  <div style="display:flex;gap:10px;max-width:520px">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search patients, appointments, employees…"
+           style="flex:1;padding:9px 14px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:14px;outline:none"
+           autofocus>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+  </div>
+</form>
+
+{% if q and q|length < 2 %}
+<div class="alert alert-warning"><i class="fas fa-info-circle"></i> Please enter at least 2 characters.</div>
+{% elif q %}
+
+{% if total == 0 %}
+<div class="empty-state" style="margin-top:40px">
+  <i class="fas fa-search"></i>
+  <p>No results found for "{{ q }}"</p>
+</div>
+{% else %}
+
+<!-- Patients -->
+{% if results.patients %}
+<div class="card" style="margin-bottom:20px">
+  <div class="card-header">
+    <span class="card-title"><i class="fas fa-user-injured" style="color:var(--accent);margin-right:6px"></i>Patients</span>
+    <span class="badge badge-info">{{ results.patients|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th></th></tr></thead>
+      <tbody>
+        {% for p in results.patients %}
+        <tr>
+          <td style="font-weight:500">{{ p.get_full_name }}</td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.phone }}</td>
+          <td>{{ p.city|default:"—" }}</td>
+          <td><a href="{% url 'clinic:patient_profile' pk=p.pk %}" class="btn btn-outline btn-sm">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Appointments -->
+{% if results.appointments %}
+<div class="card" style="margin-bottom:20px">
+  <div class="card-header">
+    <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--accent);margin-right:6px"></i>Appointments</span>
+    <span class="badge badge-info">{{ results.appointments|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for a in results.appointments %}
+        <tr>
+          <td style="font-family:monospace;font-size:12px">{{ a.apt_id }}</td>
+          <td>{{ a.patient.get_full_name }}</td>
+          <td>Dr. {{ a.doctor.user.last_name }}</td>
+          <td>{{ a.date }}</td>
+          <td>
+            {% if a.status == 'confirmed' %}<span class="badge badge-success">Confirmed</span>
+            {% elif a.status == 'pending' %}<span class="badge badge-warning">Pending</span>
+            {% elif a.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+            {% else %}<span class="badge badge-gray">{{ a.status }}</span>{% endif %}
+          </td>
+          <td><a href="{% url 'clinic:appointment_edit' pk=a.pk %}" class="btn btn-outline btn-sm">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Employees -->
+{% if results.employees %}
+<div class="card">
+  <div class="card-header">
+    <span class="card-title"><i class="fas fa-user-md" style="color:var(--accent);margin-right:6px"></i>Employees</span>
+    <span class="badge badge-info">{{ results.employees|length }}</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+      <tbody>
+        {% for e in results.employees %}
+        <tr>
+          <td style="font-family:monospace;font-size:12px">{{ e.emp_id }}</td>
+          <td style="font-weight:500">{{ e.user.get_full_name }}</td>
+          <td>{{ e.user.email }}</td>
+          <td>{{ e.role|default:"—" }}</td>
+          <td><a href="{% url 'clinic:employee_edit' pk=e.pk %}" class="btn btn-outline btn-sm">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "clinic/base.html" %}
+{% block title %}Delete Invoice{% endblock %}
+{% block topbar_title %}Delete Invoice{% endblock %}
+{% block content %}
+<div style="max-width:480px;margin:40px auto">
+  <div class="card">
+    <div class="card-header"><span class="card-title" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i> Delete Invoice</span></div>
+    <div class="card-body">
+      <p style="margin-bottom:16px">Delete invoice <strong>#{{ payslip.pk }}</strong> for <strong>{{ payslip.patient.get_full_name }}</strong> (€{{ payslip.amount }} — {{ payslip.service }})?</p>
+      <div class="flex-gap">
+        <form method="post">{% csrf_token %}<button class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button></form>
+        <a href="{% url 'clinic:patient_payslip_list' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

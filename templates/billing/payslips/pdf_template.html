@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        color: #333;
+        margin: 40px;
+    }
+    .header {
+        text-align: center;
+        border-bottom: 3px solid #0d6efd;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .header h1 {
+        color: #0d6efd;
+        font-size: 26px;
+        margin: 0;
+    }
+    .header p { margin: 4px 0; color: #666; }
+
+    .section-title {
+        background: #0d6efd;
+        color: white;
+        padding: 6px 12px;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+    }
+    table td:first-child { color: #666; width: 40%; }
+    table td:last-child  { font-weight: bold; }
+
+    .salary-table td {
+        padding: 10px 12px;
+    }
+    .net-row td {
+        background: #0d6efd;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        border: none;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .paid    { background: #d1fae5; color: #065f46; }
+    .pending { background: #fef3c7; color: #92400e; }
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 11px;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <h1>🦷 DentCare</h1>
+    <p>Dental Clinic Management System</p>
+    <p>Employee Payslip — {{ payslip.month }} {{ payslip.year }}</p>
+</div>
+
+<!-- Employee Info -->
+<div class="section-title">Employee Information</div>
+<table>
+    <tr>
+        <td>Employee ID</td>
+        <td>{{ payslip.employee.emp_id }}</td>
+    </tr>
+    <tr>
+        <td>Full Name</td>
+        <td>{{ payslip.employee.user.get_full_name }}</td>
+    </tr>
+    <tr>
+        <td>Position</td>
+        <td>{{ payslip.employee.position }}</td>
+    </tr>
+    <tr>
+        <td>Department</td>
+        <td>{{ payslip.employee.get_department_display }}</td>
+    </tr>
+    <tr>
+        <td>Role</td>
+        <td>{{ payslip.employee.user.role|title }}</td>
+    </tr>
+</table>
+
+<!-- Salary Details -->
+<div class="section-title">Salary Details</div>
+<table class="salary-table">
+    <tr>
+        <td>Base Salary</td>
+        <td>{{ payslip.base_salary }} MAD</td>
+    </tr>
+    <tr>
+        <td>Bonuses</td>
+        <td style="color: green;">+ {{ payslip.bonuses }} MAD</td>
+    </tr>
+    <tr>
+        <td>Deductions</td>
+        <td style="color: red;">- {{ payslip.deductions }} MAD</td>
+    </tr>
+    <tr class="net-row">
+        <td>NET SALARY</td>
+        <td>{{ payslip.net_salary }} MAD</td>
+    </tr>
+</table>
+
+<!-- Status & Notes -->
+<div class="section-title">Payment Status</div>
+<table>
+    <tr>
+        <td>Status</td>
+        <td>
+            <span class="status-badge {{ payslip.status }}">
+                {{ payslip.get_status_display }}
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Pay Period</td>
+        <td>{{ payslip.month }} {{ payslip.year }}</td>
+    </tr>
+    <tr>
+        <td>Generated On</td>
+        <td>{{ payslip.created_at|date:"d M Y" }}</td>
+    </tr>
+    {% if payslip.notes %}
+    <tr>
+        <td>Notes</td>
+        <td>{{ payslip.notes }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+<div class="footer">
+    This payslip was generated automatically by DentCare Management System.<br>
+    For any queries, contact the HR department.
+</div>
+
+</body>
+</html>

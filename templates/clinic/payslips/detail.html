@@ -1,0 +1,63 @@
+{% extends "clinic/base.html" %}
+{% block title %}Invoice #{{ payslip.pk }}{% endblock %}
+{% block topbar_title %}Détail de la Facture{% endblock %}
+{% block nav_invoices %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:patient_payslip_list' %}">Invoices</a> / #{{ payslip.pk }}</div>
+    <h1>Invoice #{{ payslip.pk }}</h1>
+  </div>
+  <div class="flex-gap">
+    <a href="{% url 'clinic:patient_payslip_pdf' pk=payslip.pk %}" class="btn btn-outline"><i class="fas fa-download"></i> Télécharger PDF</a>
+    {% if not payslip.paid %}
+    <form method="post" action="{% url 'clinic:patient_payslip_mark_paid' pk=payslip.pk %}">{% csrf_token %}
+      <button class="btn btn-success"><i class="fas fa-check"></i> Mark as Payé</button>
+    </form>
+    {% endif %}
+    <form method="post" action="{% url 'clinic:patient_payslip_delete' pk=payslip.pk %}" onsubmit="return confirm('Delete this invoice?')">{% csrf_token %}
+      <button class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+    </form>
+  </div>
+</div>
+<div class="card" style="max-width:600px">
+  <div style="padding:32px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--navy)">DentCare</div>
+        <div style="color:var(--text-muted);font-size:13px;margin-top:4px">Dental Management System</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:20px;font-weight:700">INVOICE</div>
+        <div style="color:var(--text-muted);font-size:13px">#{{ payslip.pk }}</div>
+        <div style="margin-top:6px">{% if payslip.paid %}<span class="badge badge-success" style="font-size:13px">PAID</span>{% else %}<span class="badge badge-danger" style="font-size:13px">UNPAID</span>{% endif %}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+      <div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px">Patient</div>
+        <div style="font-weight:600">{{ payslip.patient.get_full_name }}</div>
+        <div style="color:var(--text-muted);font-size:13px">{{ payslip.patient.email }}</div>
+        <div style="color:var(--text-muted);font-size:13px">{{ payslip.patient.phone }}</div>
+      </div>
+      <div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px">Date</div>
+        <div style="font-weight:600">{{ payslip.payment_date|date:"F j, Y" }}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+      <thead><tr style="background:#f8fafc"><th style="padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">Service</th><th style="padding:10px 14px;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">Montant</th></tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:12px 14px">{{ payslip.service }}</td>
+          <td style="padding:12px 14px;text-align:right;font-weight:600">€{{ payslip.amount }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr><td style="padding:12px 14px;font-weight:700;font-size:15px">Total</td>
+        <td style="padding:12px 14px;text-align:right;font-weight:700;font-size:18px;color:var(--navy)">€{{ payslip.amount }}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %}

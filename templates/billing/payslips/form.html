@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Payslip — DentCare{% endblock %}
+{% block page_title %}{{ action }} Payslip{% endblock %}
+
+{% block content %}
+<div class="card p-4" style="max-width: 750px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Employee *</label>
+                <select name="employee" class="form-select" required>
+                    <option value="">-- Select Employee --</option>
+                    {% for emp in employees %}
+                    <option value="{{ emp.pk }}"
+                        {% if payslip.employee.pk == emp.pk %}selected{% endif %}>
+                        {{ emp.emp_id }} — {{ emp.user.get_full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Month *</label>
+                <select name="month" class="form-select" required>
+                    {% for val, label in months %}
+                    <option value="{{ val }}"
+                        {% if payslip.month == val %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Year *</label>
+                <input type="number" name="year" class="form-control"
+                       value="{{ payslip.year|default:'2026' }}"
+                       min="2020" max="2030" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Base Salary *</label>
+                <input type="number" name="base_salary" class="form-control"
+                       step="0.01" required
+                       value="{{ payslip.base_salary|default:'' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Bonuses</label>
+                <input type="number" name="bonuses" class="form-control"
+                       step="0.01" value="{{ payslip.bonuses|default:'0' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Deductions</label>
+                <input type="number" name="deductions" class="form-control"
+                       step="0.01" value="{{ payslip.deductions|default:'0' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Status</label>
+                <select name="status" class="form-select">
+                    {% for val, label in statuses %}
+                    <option value="{{ val }}"
+                        {% if payslip.status == val %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Notes</label>
+                <textarea name="notes" class="form-control" rows="2">{{ payslip.notes|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-lg me-1"></i> Save Payslip
+            </button>
+            <a href="{% url 'billing:payslip_list' %}" class="btn btn-outline-secondary px-4">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

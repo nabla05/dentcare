@@ -1,0 +1,68 @@
+{% extends "home/base_public.html" %}
+
+{% block title %}À propos — DentCare{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="py-5 bg-light">
+  <div class="container py-4 text-center">
+    <h1 class="display-5 fw-bold mb-3">À propos de DentCare</h1>
+    <p class="lead text-muted mx-auto" style="max-width:620px;">
+      Nous sommes une clinique dentaire moderne dédiée à offrir des soins de haute qualité
+      et bienveillants à des patients de tous âges.
+    </p>
+  </div>
+</section>
+
+<!-- Mission -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <h2 class="fw-bold mb-3">Notre Mission</h2>
+        <p class="text-muted">
+          Chez DentCare, notre mission est de fournir des soins dentaires exceptionnels dans un
+          environnement confortable et accueillant. Nous combinons les dernières technologies
+          avec une approche douce pour que chaque visite vous laisse souriant.
+        </p>
+        <ul class="list-unstyled mt-4">
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Professionnels dentaires certifiés</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Équipement de pointe</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Protocoles stricts de stérilisation et de sécurité</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Rendez-vous flexibles et réservation en ligne</li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="bg-primary bg-opacity-10 rounded-4 p-5 text-center">
+          <i class="bi bi-hospital display-1 text-primary"></i>
+          <p class="mt-3 mb-0 fw-semibold fs-5">Au service de la communauté depuis 2010</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Meet the Doctors -->
+{% if doctors %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-5">Rencontrez Nos Médecins</h2>
+    <div class="row g-4 justify-content-center">
+      {% for emp in doctors %}
+      <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100 text-center p-4">
+          <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3"
+               style="width:80px;height:80px;">
+            <i class="bi bi-person-circle fs-1 text-primary"></i>
+          </div>
+          <h6 class="fw-bold mb-1">Dr. {{ emp.user.get_full_name }}</h6>
+          <p class="text-muted small mb-2">{{ emp.get_department_display }}</p>
+          <span class="badge bg-primary bg-opacity-10 text-primary">{{ emp.position }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

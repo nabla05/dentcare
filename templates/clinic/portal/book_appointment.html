@@ -1,0 +1,73 @@
+{% extends "clinic/base.html" %}
+{% block title %}Book Appointment{% endblock %}
+{% block topbar_title %}Book an Appointment{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb">Patient Portal / <a href="{% url 'clinic:portal_my_appointments' %}">My Appointments</a> / Book</div>
+    <h1>Book an Appointment</h1>
+  </div>
+</div>
+<div class="card" style="max-width:640px">
+  <div class="card-header"><span class="card-title">New Appointment Request</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Doctor *</label>
+          <select name="doctor" id="doctorSelect" required>
+            <option value="">— Select a Doctor —</option>
+            {% for d in doctors %}<option value="{{ d.pk }}">Dr. {{ d.user.get_full_name }} — {{ d.position }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" name="date" id="dateInput" required min="{{ today }}">
+        </div>
+        <div class="form-group">
+          <label>Preferred Time *</label>
+          <select name="start_time" id="timeSelect" required>
+            <option value="">— Select date first —</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Reason for Visit</label>
+          <textarea name="reason" placeholder="Brief description of your concern…"></textarea>
+        </div>
+      </div>
+      <div class="flex-gap mt-16">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-calendar-check"></i> Request Appointment</button>
+        <a href="{% url 'clinic:portal_my_appointments' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% block extra_js %}
+<script>
+const dateInput    = document.getElementById('dateInput');
+const doctorSelect = document.getElementById('doctorSelect');
+const timeSelect   = document.getElementById('timeSelect');
+
+async function loadTimes() {
+  const date   = dateInput.value;
+  const doctor = doctorSelect.value;
+  if (!date) return;
+  const resp = await fetch(`/appointments/available-times/?date=${date}&doctor=${doctor}`);
+  const data = await resp.json();
+  timeSelect.innerHTML = '<option value="">— Select time —</option>';
+  if (data.available_times.length === 0) {
+    timeSelect.innerHTML = '<option value="">No slots available for this date</option>';
+    return;
+  }
+  data.available_times.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    timeSelect.appendChild(opt);
+  });
+}
+dateInput.addEventListener('change', loadTimes);
+doctorSelect.addEventListener('change', loadTimes);
+</script>
+{% endblock %}
+{% endblock %}

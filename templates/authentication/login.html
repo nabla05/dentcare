@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — DentCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#f4f6fb}
+    .left{width:420px;flex-shrink:0;background:#0f1f3d;display:flex;flex-direction:column;justify-content:center;padding:60px 48px;color:#fff}
+    .logo{font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:8px}
+    .logo span{color:#2d9cdb}
+    .tagline{font-size:14px;color:rgba(255,255,255,.5);line-height:1.6;margin-top:12px;max-width:280px}
+    .features{margin-top:48px;display:flex;flex-direction:column;gap:16px}
+    .feature{display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,.65)}
+    .feature i{width:32px;height:32px;background:rgba(45,156,219,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#2d9cdb;font-size:14px;flex-shrink:0}
+    .right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+    .card{width:100%;max-width:400px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:40px}
+    .card h2{font-size:22px;font-weight:600;margin-bottom:6px;color:#1a202c}
+    .card p{font-size:13px;color:#718096;margin-bottom:28px}
+    .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+    label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#718096}
+    .input-wrap{position:relative}
+    .input-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#a0aec0;font-size:13px}
+    input{width:100%;padding:9px 12px 9px 36px;border:1px solid #e2e8f0;border-radius:7px;font-family:inherit;font-size:14px;color:#1a202c;outline:none;transition:border-color .15s,box-shadow .15s}
+    input:focus{border-color:#2d9cdb;box-shadow:0 0 0 3px rgba(45,156,219,.12)}
+    .btn{display:block;width:100%;padding:10px;background:#2d9cdb;color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:8px}
+    .btn:hover{background:#1a87c8}
+    .link{text-align:center;margin-top:20px;font-size:13px;color:#718096}
+    .link a{color:#2d9cdb;text-decoration:none;font-weight:500}
+    .alert{padding:10px 14px;border-radius:7px;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .alert-error{background:#fdedec;color:#922b21;border:1px solid #f5b7b1}
+    .alert-success{background:#eafaf1;color:#1e8449;border:1px solid #a9dfbf}
+  </style>
+</head>
+<body>
+
+<div class="left">
+  <div class="logo">Dent<span>Care</span></div>
+  <div style="font-size:13px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em">Système de Gestion</div>
+  <div class="tagline">Gestion complète du cabinet dentaire — patients, rendez-vous, diagnostics et facturation en un seul endroit.</div>
+  <div class="features">
+    <div class="feature"><i class="fas fa-calendar-check"></i>Planification intelligente des RDV</div>
+    <div class="feature"><i class="fas fa-stethoscope"></i>Suivi des diagnostics et traitements</div>
+    <div class="feature"><i class="fas fa-file-invoice-dollar"></i>Facturation automatisée</div>
+    <div class="feature"><i class="fas fa-shield-alt"></i>Contrôle d'accès par rôle</div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="card">
+    <h2>Bienvenue</h2>
+    <p>Connectez-vous à votre compte DentCare</p>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags|default:'error' }}">
+      <i class="fas fa-exclamation-circle"></i> {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Nom d'utilisateur</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" placeholder="Entrez votre nom d'utilisateur" required autofocus>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" placeholder="Entrez votre mot de passe" required>
+        </div>
+      </div>
+      <button type="submit" class="btn">Se Connecter</button>
+    </form>
+
+    <div class="link">Vous n'avez pas de compte ? <a href="{% url 'authentication:register' %}">S'inscrire comme Patient</a></div>
+  </div>
+</div>
+
+</body>
+</html>

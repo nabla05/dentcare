@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription — DentCare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;background:#f4f6fb;display:flex;align-items:center;justify-content:center;padding:40px}
+    .card{width:100%;max-width:540px;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:40px}
+    .logo{font-family:'DM Serif Display',serif;font-size:22px;color:#0f1f3d;margin-bottom:4px}
+    .logo span{color:#2d9cdb}
+    h2{font-size:20px;font-weight:600;margin:16px 0 4px;color:#1a202c}
+    .subtitle{font-size:13px;color:#718096;margin-bottom:24px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-group{display:flex;flex-direction:column;gap:4px}
+    .form-group.full{grid-column:1/-1}
+    label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#718096}
+    .input-wrap{position:relative}
+    .input-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#a0aec0;font-size:12px}
+    input{width:100%;padding:8px 11px 8px 32px;border:1px solid #e2e8f0;border-radius:7px;font-family:inherit;font-size:13.5px;color:#1a202c;outline:none;transition:border-color .15s,box-shadow .15s}
+    input:focus{border-color:#2d9cdb;box-shadow:0 0 0 3px rgba(45,156,219,.12)}
+    .btn{width:100%;padding:10px;background:#2d9cdb;color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:8px}
+    .btn:hover{background:#1a87c8}
+    .link{text-align:center;margin-top:18px;font-size:13px;color:#718096}
+    .link a{color:#2d9cdb;text-decoration:none;font-weight:500}
+    .alert{padding:10px 14px;border-radius:7px;font-size:13px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .alert-error{background:#fdedec;color:#922b21;border:1px solid #f5b7b1}
+    .divider{height:1px;background:#e2e8f0;margin:20px 0}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Dent<span>Care</span></div>
+  <h2>Créer un Compte Patient</h2>
+  <p class="subtitle">Inscrivez-vous pour prendre des rendez-vous et gérer vos soins dentaires</p>
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Prénom *</label>
+        <div class="input-wrap"><i class="fas fa-user"></i>
+          <input type="text" name="first_name" placeholder="Prénom" required value="{{ request.POST.first_name }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nom *</label>
+        <div class="input-wrap"><i class="fas fa-user"></i>
+          <input type="text" name="last_name" placeholder="Nom" required value="{{ request.POST.last_name }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nom d'utilisateur *</label>
+        <div class="input-wrap"><i class="fas fa-at"></i>
+          <input type="text" name="username" placeholder="Choisissez un nom d'utilisateur" required value="{{ request.POST.username }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-mail *</label>
+        <div class="input-wrap"><i class="fas fa-envelope"></i>
+          <input type="email" name="email" placeholder="Adresse e-mail" required value="{{ request.POST.email }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe *</label>
+        <div class="input-wrap"><i class="fas fa-lock"></i>
+          <input type="password" name="password1" placeholder="Choisissez un mot de passe" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Mot de passe *</label>
+        <div class="input-wrap"><i class="fas fa-lock"></i>
+          <input type="password" name="password2" placeholder="Répéter le mot de passe" required>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn">Créer un Compte</button>
+  </form>
+  <div class="link">Vous avez déjà un compte ? <a href="{% url 'authentication:login' %}">Se connecter</a></div>
+</div>
+</body>
+</html>

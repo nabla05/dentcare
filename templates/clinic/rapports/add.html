@@ -1,0 +1,29 @@
+{% extends "clinic/base.html" %}
+{% block title %}Upload Rapport{% endblock %}
+{% block topbar_title %}Upload Rapport{% endblock %}
+{% block nav_patients %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:patient_profile' pk=patient.pk %}">{{ patient.get_full_name }}</a> / Upload Rapport</div>
+    <h1>Upload Medical Rapport</h1>
+  </div>
+</div>
+<div class="card" style="max-width:480px">
+  <div class="card-header"><span class="card-title">PDF Report for {{ patient.get_full_name }}</span></div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Select PDF *</label>
+        <input type="file" name="file" accept=".pdf" required>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">File will be renamed to <code>{{ patient.user.username|default:"patient" }}_rapport.pdf</code></div>
+      </div>
+      <div class="flex-gap">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Upload</button>
+        <a href="{% url 'clinic:patient_profile' pk=patient.pk %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

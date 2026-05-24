@@ -1,0 +1,48 @@
+{% extends "clinic/base.html" %}
+{% block title %}Journal d'Activité{% endblock %}
+{% block topbar_title %}Journal d'Activité{% endblock %}
+{% block nav_activity %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Journal d'Activité</div>
+    <h1>Journal d'Activité</h1>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-title">All Activity</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Utilisateur</th><th>Action</th><th>Details</th><th>Heure</th></tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td style="font-weight:500">{{ log.user.get_full_name|default:"System" }}</td>
+          <td>{{ log.action }}</td>
+          <td style="color:var(--text-muted)">{{ log.details|default:"—" }}</td>
+          <td style="white-space:nowrap;color:var(--text-muted);font-size:12px">
+            {{ log.created_at|date:"Y-m-d H:i" }}<br>
+            <span style="font-size:11px">{{ log.created_at|timesince }} ago</span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4"><div class="empty-state"><i class="fas fa-list-alt"></i><p>No activity recorded yet</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:12px 20px">
+    <div class="pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>{% endif %}
+      <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

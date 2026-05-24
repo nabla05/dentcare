@@ -1,0 +1,53 @@
+{% extends "clinic/base.html" %}
+{% block title %}Factures{% endblock %}
+{% block topbar_title %}Patient Factures{% endblock %}
+{% block nav_invoices %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Factures</div>
+    <h1>Patient Factures</h1>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><span class="card-title">{{ total }} invoice{{ total|pluralize }}</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Patient</th><th>Service</th><th>Montant</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for ps in page_obj %}
+        <tr>
+          <td style="font-family:monospace;font-size:12px">#{{ ps.pk }}</td>
+          <td><a href="{% url 'clinic:patient_profile' pk=ps.patient.pk %}" style="color:var(--accent);text-decoration:none">{{ ps.patient.get_full_name }}</a></td>
+          <td>{{ ps.service }}</td>
+          <td style="font-weight:600">€{{ ps.amount }}</td>
+          <td>{{ ps.payment_date|date:"Y-m-d" }}</td>
+          <td>{% if ps.paid %}<span class="badge badge-success">Payé</span>{% else %}<span class="badge badge-danger">Non payé</span>{% endif %}</td>
+          <td>
+            <div class="actions-cell">
+              <a href="{% url 'clinic:patient_payslip_detail' pk=ps.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'clinic:patient_payslip_pdf' pk=ps.pk %}" class="btn btn-outline btn-sm btn-icon" title="Download PDF"><i class="fas fa-download"></i></a>
+              {% if not ps.paid %}
+              <form method="post" action="{% url 'clinic:patient_payslip_mark_paid' pk=ps.pk %}">{% csrf_token %}
+                <button class="btn btn-success btn-sm btn-icon" title="Mark paid"><i class="fas fa-check"></i></button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}<tr><td colspan="7"><div class="empty-state"><i class="fas fa-file-invoice"></i><p>No invoices yet</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:12px 20px">
+    <div class="pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>{% endif %}
+      <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

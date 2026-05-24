@@ -1,0 +1,20 @@
+{% extends "clinic/base.html" %}
+{% block title %}Supprimer le Patient{% endblock %}
+{% block topbar_title %}Supprimer le Patient{% endblock %}
+{% block nav_patients %}active{% endblock %}
+{% block content %}
+<div style="max-width:480px;margin:40px auto">
+  <div class="card">
+    <div class="card-header"><span class="card-title" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</span></div>
+    <div class="card-body">
+      <p style="margin-bottom:16px">Êtes-vous sûr de vouloir supprimer <strong>{{ patient.get_full_name }}</strong>? This will also delete their user account and all associated records. Cette action est irréversible.</p>
+      <div class="flex-gap">
+        <form method="post">{% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Oui, Supprimer</button>
+        </form>
+        <a href="{% url 'clinic:patient_list' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

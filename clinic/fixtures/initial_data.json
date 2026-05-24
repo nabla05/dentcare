@@ -1,0 +1,167 @@
+[
+  {
+    "model": "authentication.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "password": "pbkdf2_sha256$600000$dentcare$adminpasshash",
+      "first_name": "Admin",
+      "last_name": "DentCare",
+      "email": "admin@dentcare.com",
+      "role": "admin",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "date_joined": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "authentication.user",
+    "pk": 2,
+    "fields": {
+      "username": "dr.martin",
+      "password": "pbkdf2_sha256$600000$dentcare$docpasshash",
+      "first_name": "Sophie",
+      "last_name": "Martin",
+      "email": "dr.martin@dentcare.com",
+      "role": "doctor",
+      "phone": "+1-555-0101",
+      "is_staff": true,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2026-01-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "authentication.user",
+    "pk": 3,
+    "fields": {
+      "username": "dr.bernard",
+      "password": "pbkdf2_sha256$600000$dentcare$docpasshash",
+      "first_name": "Lucas",
+      "last_name": "Bernard",
+      "email": "dr.bernard@dentcare.com",
+      "role": "doctor",
+      "phone": "+1-555-0102",
+      "is_staff": true,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2026-01-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "authentication.user",
+    "pk": 4,
+    "fields": {
+      "username": "receptionist1",
+      "password": "pbkdf2_sha256$600000$dentcare$recpasshash",
+      "first_name": "Emma",
+      "last_name": "Dubois",
+      "email": "emma.dubois@dentcare.com",
+      "role": "receptionist",
+      "phone": "+1-555-0103",
+      "is_staff": true,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2026-01-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "authentication.user",
+    "pk": 5,
+    "fields": {
+      "username": "patient.dupont",
+      "password": "pbkdf2_sha256$600000$dentcare$patpasshash",
+      "first_name": "Jean",
+      "last_name": "Dupont",
+      "email": "jean.dupont@example.com",
+      "role": "patient",
+      "phone": "+1-555-0201",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2026-02-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "clinic.employee",
+    "pk": 1,
+    "fields": {
+      "emp_id": "EMP0001",
+      "user": 2,
+      "department": "dentistry",
+      "position": "Senior Dentist",
+      "salary": "3500.00",
+      "hire_date": "2026-01-15",
+      "status": "active",
+      "notes": ""
+    }
+  },
+  {
+    "model": "clinic.employee",
+    "pk": 2,
+    "fields": {
+      "emp_id": "EMP0002",
+      "user": 3,
+      "department": "orthodontics",
+      "position": "Orthodontist",
+      "salary": "4000.00",
+      "hire_date": "2026-01-15",
+      "status": "active",
+      "notes": ""
+    }
+  },
+  {
+    "model": "clinic.receptionist",
+    "pk": 1,
+    "fields": {
+      "user": 4
+    }
+  },
+  {
+    "model": "clinic.patient",
+    "pk": 1,
+    "fields": {
+      "user": 5,
+      "first_name": "Jean",
+      "last_name": "Dupont",
+      "email": "jean.dupont@example.com",
+      "phone": "+1-555-0201",
+      "date_of_birth": "1985-06-15",
+      "gender": "male",
+      "blood_group": "A+",
+      "address": "12 Rue de Paris",
+      "city": "Lyon",
+      "country": "France",
+      "state_province": "Auvergne-Rhône-Alpes",
+      "postal_code": "69001",
+      "allergies": "Penicillin",
+      "medical_notes": "No special conditions.",
+      "created_at": "2026-02-01T10:00:00Z",
+      "updated_at": "2026-02-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "clinic.patient",
+    "pk": 2,
+    "fields": {
+      "user": null,
+      "first_name": "Marie",
+      "last_name": "Leblanc",
+      "email": "marie.leblanc@example.com",
+      "phone": "+1-555-0202",
+      "date_of_birth": "1992-03-22",
+      "gender": "female",
+      "blood_group": "O+",
+      "address": "34 Avenue Victor Hugo",
+      "city": "Paris",
+      "country": "France",
+      "state_province": "Île-de-France",
+      "postal_code": "75008",
+      "allergies": "",
+      "medical_notes": "Sensitive to cold.",
+      "created_at": "2026-02-05T09:00:00Z",
+      "updated_at": "2026-02-05T09:00:00Z"
+    }
+  }
+]

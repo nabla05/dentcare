@@ -1,0 +1,62 @@
+{% extends 'home/base_public.html' %}
+{% block title %}Services — DentCare{% endblock %}
+{% block nav_services %}active{% endblock %}
+
+{% block content %}
+
+<div style="background: linear-gradient(135deg, #1a1f2e, #0d6efd); padding: 60px 0;" class="text-white text-center">
+    <h1 class="fw-bold">Nos Services</h1>
+    <p class="opacity-75">Soins dentaires complets pour toute la famille</p>
+</div>
+
+<section>
+    <div class="container">
+        <div class="row g-4">
+
+            {% for service in services %}
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+
+                    {% if service.icon == 'tooth' %}
+                    <div class="feature-icon" style="background:#0d6efd20; color:#0d6efd;">
+                    {% elif service.icon == 'align-center' %}
+                    <div class="feature-icon" style="background:#6f42c120; color:#6f42c1;">
+                    {% elif service.icon == 'stars' %}
+                    <div class="feature-icon" style="background:#ffc10720; color:#ffc107;">
+                    {% elif service.icon == 'bandaid' %}
+                    <div class="feature-icon" style="background:#19875420; color:#198754;">
+                    {% elif service.icon == 'heart-pulse' %}
+                    <div class="feature-icon" style="background:#dc354520; color:#dc3545;">
+                    {% elif service.icon == 'camera' %}
+                    <div class="feature-icon" style="background:#0dcaf020; color:#0dcaf0;">
+                    {% elif service.icon == 'emoji-smile' %}
+                    <div class="feature-icon" style="background:#fd7e1420; color:#fd7e14;">
+                    {% elif service.icon == 'shield-check' %}
+                    <div class="feature-icon" style="background:#20c99720; color:#20c997;">
+                    {% else %}
+                    <div class="feature-icon" style="background:#e83e8c20; color:#e83e8c;">
+                    {% endif %}
+                        <i class="bi bi-{{ service.icon }}"></i>
+                    </div>
+
+                    <h5 class="fw-bold mt-3">{{ service.name }}</h5>
+                    <p class="text-muted mb-0">{{ service.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<section style="padding: 50px 0; background: #f8fbff;">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Pas sûr du service dont vous avez besoin ?</h3>
+        <p class="text-muted mb-4">Prenez un rendez-vous de consultation et nous vous guiderons.</p>
+        <a href="{% url 'home:book' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+            <i class="bi bi-calendar-check me-2"></i>Prendre Consultation
+        </a>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "clinic/base.html" %}
+{% block title %}Rendez-vous{% endblock %}
+{% block topbar_title %}Rendez-vous{% endblock %}
+{% block nav_appointments %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Rendez-vous</div>
+    <h1>Rendez-vous</h1>
+  </div>
+  <a href="{% url 'clinic:appointment_add' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Prendre RDV</a>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="form-group"><label>ID Rendez-vous</label><input type="text" name="appointment_id" value="{{ request.GET.appointment_id }}" placeholder="APT0001…"></div>
+  <div class="form-group"><label>Nom du Patient</label><input type="text" name="patient_name" value="{{ request.GET.patient_name }}" placeholder="Search…"></div>
+  <div class="form-group"><label>Date</label><input type="date" name="date" value="{{ request.GET.date }}"></div>
+  <div class="form-group">
+    <label>Statut</label>
+    <select name="status">
+      <option value="">Tous</option>
+      <option value="pending"   {% if request.GET.status == 'pending' %}selected{% endif %}>En attente</option>
+      <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmé</option>
+      <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Terminé</option>
+      <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Annulé</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-outline" style="align-self:flex-end"><i class="fas fa-search"></i> Filter</button>
+  <a href="{% url 'clinic:appointment_list' %}" class="btn btn-outline" style="align-self:flex-end">Effacer</a>
+</form>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">{{ page_obj.paginator.count }} appointment{{ page_obj.paginator.count|pluralize }}</span>
+    <button class="btn btn-danger btn-sm" id="deleteSelectedBtn" style="display:none" onclick="bulkDelete()">
+      <i class="fas fa-trash"></i> Supprimer la sélection
+    </button>
+  </div>
+  <form id="bulkForm" method="post" action="{% url 'clinic:appointment_delete_multiple' %}">
+    {% csrf_token %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>ID</th><th>Patient</th><th>Médecin</th><th>Date</th><th>Heure</th><th>Statut</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appt in page_obj %}
+          <tr>
+            <td><input type="checkbox" name="ids" value="{{ appt.pk }}" class="row-check"></td>
+            <td style="font-family:monospace;font-size:12px">{{ appt.apt_id }}</td>
+            <td><a href="{% url 'clinic:patient_profile' pk=appt.patient.pk %}" style="color:var(--accent);text-decoration:none">{{ appt.patient.get_full_name }}</a></td>
+            <td>Dr. {{ appt.doctor.user.last_name }}</td>
+            <td>{{ appt.date }}</td>
+            <td>{{ appt.start_time|time:"H:i" }}</td>
+            <td>
+              {% if appt.status == 'confirmed' %}<span class="badge badge-success">Confirmé</span>
+              {% elif appt.status == 'pending' %}<span class="badge badge-warning">En attente</span>
+              {% elif appt.status == 'cancelled' %}<span class="badge badge-danger">Annulé</span>
+              {% elif appt.status == 'completed' %}<span class="badge badge-info">Terminé</span>
+              {% else %}<span class="badge badge-gray">{{ appt.status }}</span>{% endif %}
+            </td>
+            <td>
+              <div class="actions-cell">
+                <a href="{% url 'clinic:appointment_edit' pk=appt.pk %}" class="btn btn-outline btn-sm btn-icon" title="Modifier"><i class="fas fa-edit"></i></a>
+                <button type="button" class="btn btn-outline btn-sm btn-icon toggle-btn" data-pk="{{ appt.pk }}" title="Changer le statut"><i class="fas fa-toggle-on"></i></button>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun rendez-vous trouvé</p></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  {% if page_obj.has_other_pages %}
+  <div style="padding:12px 20px">
+    <div class="pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>{% endif %}
+      <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i class="fas fa-chevron-right"></i></a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+const selectAll = document.getElementById('selectAll');
+const checks = document.querySelectorAll('.row-check');
+const deleteBtn = document.getElementById('deleteSelectedBtn');
+function updateBtn(){ deleteBtn.style.display = [...checks].some(c=>c.checked)?'inline-flex':'none'; }
+selectAll.addEventListener('change', ()=>{ checks.forEach(c=>c.checked=selectAll.checked); updateBtn(); });
+checks.forEach(c=>c.addEventListener('change', updateBtn));
+function bulkDelete(){ if(confirm('Supprimer les rendez-vous sélectionnés ?')) document.getElementById('bulkForm').submit(); }
+
+// Toggle status via AJAX
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const pk = btn.dataset.pk;
+    const resp = await fetch(`/appointments/${pk}/toggle-status/`, {
+      method: 'POST',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'}
+    });
+    const data = await resp.json();
+    const row = btn.closest('tr');
+    const statusCell = row.querySelector('td:nth-child(7)');
+    if(data.status === 'Inactive'){
+      statusCell.innerHTML = '<span class="badge badge-danger">Annulé</span>';
+    } else {
+      statusCell.innerHTML = '<span class="badge badge-warning">En attente</span>';
+    }
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

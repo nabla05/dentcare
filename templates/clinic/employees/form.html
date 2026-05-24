@@ -1,0 +1,111 @@
+{% extends "clinic/base.html" %}
+{% block title %}{{ action }} Employee{% endblock %}
+{% block topbar_title %}{{ action }} Employee{% endblock %}
+{% block nav_employees %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / <a href="{% url 'clinic:employee_list' %}">Employees</a> / {{ action }}</div>
+    <h1>{{ action }} Employee</h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:860px">
+  <div class="card-header"><span class="card-title">Employee Details</span></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input type="text" name="first_name" value="{{ employee.user.first_name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Nom *</label>
+          <input type="text" name="last_name" value="{{ employee.user.last_name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" name="username" value="{{ employee.user.username|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>E-mail *</label>
+          <input type="email" name="email" value="{{ employee.user.email|default:'' }}" required>
+        </div>
+
+        {% if action == 'Add' %}
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" name="password1" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <input type="password" name="password2" required>
+        </div>
+        {% else %}
+        <div class="form-group">
+          <label>New Password <span style="font-weight:400;color:var(--text-muted)">(leave blank to keep)</span></label>
+          <input type="password" name="password1">
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" name="password2">
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label>Employee ID</label>
+          <input type="text" name="employee_id" id="empIdInput" value="{{ employee.emp_id|default:'' }}" placeholder="Auto-generated">
+          {% if action == 'Add' %}
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Leave blank to auto-generate</div>
+          {% endif %}
+        </div>
+        <div class="form-group">
+          <label>Téléphone *</label>
+          <input type="tel" name="phone" value="{{ employee.phone|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Joining Date *</label>
+          <input type="date" name="joining_date" value="{{ employee.joining_date|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <select name="role" required>
+            <option value="Doctor"       {% if employee.role == 'Doctor' or not employee %}selected{% endif %}>Doctor</option>
+            <option value="Receptionist" {% if employee.role == 'Receptionist' %}selected{% endif %}>Receptionist</option>
+            <option value="Nurse"        {% if employee.role == 'Nurse' %}selected{% endif %}>Nurse</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Statut</label>
+          <select name="status">
+            <option value="active"   {% if employee.status == 'active' or not employee %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if employee.status == 'inactive' %}selected{% endif %}>Inactive</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="flex-gap mt-16">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Employee</button>
+        <a href="{% url 'clinic:employee_list' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if action == 'Add' %}
+{% block extra_js %}
+<script>
+// Pre-fill employee ID via AJAX on page load
+fetch('{% url "clinic:get_latest_employee_id" %}')
+  .then(r => r.json())
+  .then(data => {
+    const input = document.getElementById('empIdInput');
+    if (!input.value) input.placeholder = data.employee_id;
+  });
+</script>
+{% endblock %}
+{% endif %}
+{% endblock %}

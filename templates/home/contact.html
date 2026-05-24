@@ -1,0 +1,63 @@
+{% extends 'home/base_public.html' %}
+{% block title %}Contact — DentCare{% endblock %}
+{% block nav_contact %}active{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(135deg, #1a1f2e, #0d6efd);
+            padding: 60px 0;" class="text-white text-center">
+    <h1 class="fw-bold">Contactez-Nous</h1>
+    <p class="opacity-75">Nous serions ravis de vous entendre</p>
+</div>
+
+<section>
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="feature-card">
+                    <h5 class="fw-bold mb-4">Envoyez-nous un message</h5>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Votre Nom</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">E-mail</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Sujet</label>
+                                <input type="text" name="subject" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Message</label>
+                                <textarea name="message" class="form-control" rows="5" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 mt-3 fw-semibold">
+                            <i class="bi bi-send me-2"></i>Envoyer le Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="col-lg-4">
+                {% for icon, label, value in contact_info %}
+                <div class="feature-card mb-3 d-flex align-items-start gap-3">
+                    <div class="feature-icon flex-shrink-0" style="width:44px; height:44px; font-size:1.1rem;">
+                        <i class="bi bi-{{ icon }}"></i>
+                    </div>
+                    <div>
+                        <p class="fw-semibold mb-0">{{ label }}</p>
+                        <p class="text-muted mb-0" style="font-size:0.9rem;">{{ value }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

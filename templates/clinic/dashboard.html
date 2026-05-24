@@ -1,0 +1,100 @@
+{% extends "clinic/base.html" %}
+{% block title %}Tableau de Bord{% endblock %}
+{% block topbar_title %}Tableau de Bord{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">Home / Tableau de Bord</div>
+<div class="page-header"><h1>Aperçu</h1></div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-user-injured"></i></div>
+    <div><div class="stat-value">{{ total_patients }}</div><div class="stat-label">Patients</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-user-md"></i></div>
+    <div><div class="stat-value">{{ total_doctors }}</div><div class="stat-label">Médecins</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="fas fa-headset"></i></div>
+    <div><div class="stat-value">{{ total_receptionists }}</div><div class="stat-label">Réceptionnistes</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber"><i class="fas fa-calendar-check"></i></div>
+    <div><div class="stat-value">{{ total_appointments }}</div><div class="stat-label">Rendez-vous</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="fas fa-clock"></i></div>
+    <div><div class="stat-value">{{ waiting }}</div><div class="stat-label">En Attente</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon teal"><i class="fas fa-stethoscope"></i></div>
+    <div><div class="stat-value">{{ total_diagnoses }}</div><div class="stat-label">Diagnostics</div></div>
+  </div>
+</div>
+
+<!-- Two-column: today's appointments + recent activity -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+  <!-- Today's appointments -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><i class="fas fa-calendar-day" style="color:var(--accent);margin-right:6px"></i>Rendez-vous d'Aujourd'hui</span>
+      <a href="{% url 'clinic:appointment_list' %}" class="btn btn-outline btn-sm">Voir tout</a>
+    </div>
+    <div class="table-wrap">
+      {% if todays_appointments %}
+      <table>
+        <thead><tr><th>Patient</th><th>Médecin</th><th>Heure</th><th>Statut</th></tr></thead>
+        <tbody>
+          {% for appt in todays_appointments %}
+          <tr>
+            <td>{{ appt.patient.get_full_name }}</td>
+            <td>Dr. {{ appt.doctor.user.last_name }}</td>
+            <td>{{ appt.start_time|time:"H:i" }}</td>
+            <td>
+              {% if appt.status == 'confirmed' %}<span class="badge badge-success">Confirmé</span>
+              {% elif appt.status == 'pending' %}<span class="badge badge-warning">En attente</span>
+              {% elif appt.status == 'cancelled' %}<span class="badge badge-danger">Annulé</span>
+              {% else %}<span class="badge badge-gray">{{ appt.status }}</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun rendez-vous aujourd'hui</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent activity -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><i class="fas fa-list-alt" style="color:var(--accent);margin-right:6px"></i>Activité Récente</span>
+      <a href="{% url 'clinic:activity_logs' %}" class="btn btn-outline btn-sm">Voir tout</a>
+    </div>
+    <div class="table-wrap">
+      {% if recent_logs %}
+      <table>
+        <thead><tr><th>Utilisateur</th><th>Action</th><th>Heure</th></tr></thead>
+        <tbody>
+          {% for log in recent_logs %}
+          <tr>
+            <td>{{ log.user.get_full_name|default:"Système" }}</td>
+            <td>{{ log.action }}</td>
+            <td style="white-space:nowrap;color:var(--text-muted)">{{ log.created_at|timesince }} il y a</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune activité pour le moment</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

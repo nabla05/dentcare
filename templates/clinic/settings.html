@@ -1,0 +1,116 @@
+{% extends "clinic/base.html" %}
+{% block title %}Paramètres{% endblock %}
+{% block topbar_title %}Paramètres{% endblock %}
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / Paramètres</div>
+    <h1>Paramètres</h1>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+  <!-- Mode Maintenance -->
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fas fa-tools" style="color:var(--warning);margin-right:6px"></i>Mode Maintenance</span></div>
+    <div class="card-body">
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">
+        When enabled, non-staff visitors see a maintenance page (HTTP 503) instead of the site.
+      </p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="toggle_maintenance">
+        <div style="display:flex;align-items:center;gap:14px">
+          <label class="toggle-switch">
+            <input type="checkbox" name="maintenance_enabled" {% if maintenance_mode %}checked{% endif %} onchange="this.form.submit()">
+            <span class="slider"></span>
+          </label>
+          <span style="font-size:14px;font-weight:500">
+            {% if maintenance_mode %}
+            <span style="color:var(--warning)"><i class="fas fa-exclamation-triangle"></i> Maintenance is ON</span>
+            {% else %}
+            <span style="color:var(--success)"><i class="fas fa-check-circle"></i> Site is live</span>
+            {% endif %}
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mark Doctor Unavailable -->
+  <div class="card">
+    <div class="card-header"><span class="card-title"><i class="fas fa-calendar-times" style="color:var(--danger);margin-right:6px"></i>Doctor Unavailability</span></div>
+    <div class="card-body">
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">Block a date so no appointments can be booked for that doctor.</p>
+      <form id="unavailForm">
+        {% csrf_token %}
+        <div class="form-grid" style="margin-bottom:12px">
+          <div class="form-group">
+            <label>Doctor</label>
+            <select id="unavailDoctor">
+              <option value="">— Select —</option>
+              {% for d in doctors %}<option value="{{ d.pk }}">Dr. {{ d.user.get_full_name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="unavailDate">
+          </div>
+        </div>
+        <div class="flex-gap">
+          <button type="button" class="btn btn-danger btn-sm" onclick="markUnavail('mark')"><i class="fas fa-ban"></i> Block Date</button>
+          <button type="button" class="btn btn-success btn-sm" onclick="markUnavail('cancel')"><i class="fas fa-check"></i> Unblock Date</button>
+        </div>
+        <div id="unavailMsg" style="margin-top:10px;font-size:13px"></div>
+      </form>
+
+      {% if unavailable_dates %}
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Blocked Dates</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        {% for ud in unavailable_dates %}
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:6px 10px;background:var(--bg);border-radius:6px">
+          <span>Dr. {{ ud.doctor.user.last_name }} — {{ ud.date }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% block extra_js %}
+<style>
+.toggle-switch { position:relative;display:inline-block;width:44px;height:24px; }
+.toggle-switch input { opacity:0;width:0;height:0; }
+.slider { position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e0;transition:.2s;border-radius:24px; }
+.slider:before { position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;transition:.2s;border-radius:50%; }
+input:checked + .slider { background:var(--warning); }
+input:checked + .slider:before { transform:translateX(20px); }
+</style>
+<script>
+async function markUnavail(action) {
+  const doctor = document.getElementById('unavailDoctor').value;
+  const date   = document.getElementById('unavailDate').value;
+  const msg    = document.getElementById('unavailMsg');
+  if (!doctor || !date) { msg.innerHTML = '<span style="color:var(--danger)">Please select a doctor and date.</span>'; return; }
+  const fd = new FormData();
+  fd.append('doctor_id', doctor);
+  fd.append('unavailable_date', date);
+  fd.append('action', action);
+  fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+  const resp = await fetch('{% url "clinic:mark_unavailable" %}', { method:'POST', body:fd });
+  const data = await resp.json();
+  msg.innerHTML = data.status === 'marked'
+    ? '<span style="color:var(--success)">Date blocked successfully.</span>'
+    : data.status === 'cancelled'
+    ? '<span style="color:var(--success)">Date unblocked.</span>'
+    : '<span style="color:var(--danger)">Error: ' + (data.error||'Unknown') + '</span>';
+}
+</script>
+{% endblock %}
+{% endblock %}

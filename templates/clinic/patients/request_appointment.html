@@ -1,0 +1,93 @@
+{% extends 'home/base_public.html' %}
+{% block title %}Request Appointment — DentCare{% endblock %}
+{% block content %}
+<section class="py-5" style="min-height:80vh; background:#f8fbff;">
+  <div class="container" style="max-width:640px;">
+    <h3 class="mb-1">Request an Appointment</h3>
+    <p class="text-muted mb-4">Fill in the form below and we'll confirm your appointment shortly.</p>
+
+    {% if messages %}
+      {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Doctor <span class="text-danger">*</span></label>
+            <select name="doctor" class="form-select" required>
+              <option value="">— Select a doctor —</option>
+              {% for doc in doctors %}
+              <option value="{{ doc.pk }}">Dr. {{ doc.user.get_full_name }} ({{ doc.get_department_display }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Preferred Date <span class="text-danger">*</span></label>
+            <input type="date" name="date" class="form-control" min="{{ today }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Preferred Time</label>
+            <select name="time" class="form-select" id="timeSelect">
+              <option value="09:00">09:00</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Reason / Notes</label>
+            <textarea name="reason" class="form-control" rows="3" placeholder="Describe your concern..."></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-calendar-check me-1"></i>Submit Request
+            </button>
+            <a href="{% url 'clinic:portal_my_appointments' %}" class="btn btn-outline-secondary">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+const today = new Date().toISOString().split('T')[0];
+document.querySelector('input[name="date"]').min = today;
+
+const doctorSel = document.querySelector('select[name="doctor"]');
+const dateSel   = document.querySelector('input[name="date"]');
+const timeSelect = document.getElementById('timeSelect');
+
+async function loadTimes() {
+  const docId = doctorSel.value;
+  const date  = dateSel.value;
+  if (!docId || !date) return;
+  try {
+    const res  = await fetch(`/dashboard/available-times/?date=${date}&doctor_id=${docId}`);
+    const data = await res.json();
+    timeSelect.innerHTML = '';
+    if (data.available_times.length === 0) {
+      timeSelect.innerHTML = '<option value="">No available slots</option>';
+    } else {
+      data.available_times.forEach(t => {
+        timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+    }
+  } catch(e) {}
+}
+doctorSel.addEventListener('change', loadTimes);
+dateSel.addEventListener('change', loadTimes);
+</script>
+{% endblock %}

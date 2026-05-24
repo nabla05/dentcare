@@ -1,0 +1,199 @@
+{% extends "clinic/base.html" %}
+{% block title %}{{ patient.get_full_name }}{% endblock %}
+{% block topbar_title %}Profil Patient{% endblock %}
+{% block nav_patients %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / <a href="{% url 'clinic:patient_list' %}">Patients</a> / {{ patient.get_full_name }}</div>
+    <h1>{{ patient.get_full_name }}</h1>
+  </div>
+  <div class="flex-gap">
+    <a href="{% url 'clinic:patient_edit' pk=patient.pk %}" class="btn btn-outline"><i class="fas fa-edit"></i> Edit</a>
+    <a href="{% url 'clinic:diagnosis_add' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Diagnosis</a>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start">
+
+  <!-- Info card -->
+  <div class="card">
+    <div style="padding:24px;text-align:center;border-bottom:1px solid var(--border)">
+      {% if patient.avatar %}
+      <img src="{{ patient.avatar.url }}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin-bottom:10px">
+      {% else %}
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;color:#fff;margin:0 auto 10px">
+        {{ patient.first_name|first|upper }}
+      </div>
+      {% endif %}
+      <div style="font-weight:600;font-size:15px">{{ patient.get_full_name }}</div>
+      <div style="color:var(--text-muted);font-size:12px;margin-top:3px">{{ patient.email }}</div>
+    </div>
+    <div style="padding:16px">
+      {% for label, value in field_rows %}
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
+        <span style="color:var(--text-muted)">{{ label }}</span>
+        <span style="font-weight:500">{{ value|default:"—" }}</span>
+      </div>
+      {% endfor %}
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:var(--text-muted)">Phone</span><span style="font-weight:500">{{ patient.phone }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:var(--text-muted)">Age</span><span style="font-weight:500">{{ patient.age|default:"—" }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:var(--text-muted)">Gender</span><span style="font-weight:500">{{ patient.get_gender_display|default:"—" }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:var(--text-muted)">Groupe Sanguin</span><span style="font-weight:500">{{ patient.blood_group|default:"—" }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:var(--text-muted)">City</span><span style="font-weight:500">{{ patient.city|default:"—" }}</span></div>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border)">
+      <a href="{% url 'clinic:rapport_add' patient_pk=patient.pk %}" class="btn btn-outline btn-sm" style="width:100%;justify-content:center"><i class="fas fa-file-pdf"></i> Upload Rapport</a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div>
+    <!-- Tab nav -->
+    <div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--border)">
+      {% for tab in 'appointments diagnoses invoices rapports' %}{% endfor %}
+      <button class="tab-btn active" data-tab="appointments">Rendez-vous ({{ appointments|length }})</button>
+      <button class="tab-btn" data-tab="diagnoses">Diagnostics ({{ diagnoses|length }})</button>
+      <button class="tab-btn" data-tab="invoices">Factures ({{ payslips|length }})</button>
+      <button class="tab-btn" data-tab="rapports">Rapports ({{ rapports|length }})</button>
+    </div>
+
+    <!-- Rendez-vous tab -->
+    <div class="tab-panel card" id="tab-appointments" style="border-top:none;border-radius:0 0 var(--radius) var(--radius)">
+      <div class="card-header">
+        <span class="card-title">Rendez-vous</span>
+        <a href="{% url 'clinic:appointment_add' %}" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> Book</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for appt in appointments %}
+            <tr>
+              <td style="font-family:monospace;font-size:12px">{{ appt.apt_id }}</td>
+              <td>Dr. {{ appt.doctor.user.last_name }}</td>
+              <td>{{ appt.date }}</td>
+              <td>{{ appt.start_time|time:"H:i" }}</td>
+              <td>
+                {% if appt.status == 'confirmed' %}<span class="badge badge-success">Confirmed</span>
+                {% elif appt.status == 'pending' %}<span class="badge badge-warning">Pending</span>
+                {% elif appt.status == 'cancelled' %}<span class="badge badge-danger">Cancelled</span>
+                {% else %}<span class="badge badge-gray">{{ appt.status }}</span>{% endif %}
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="5"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun rendez-vous</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Diagnostics tab -->
+    <div class="tab-panel card" id="tab-diagnoses" style="display:none;border-top:none;border-radius:0 0 var(--radius) var(--radius)">
+      <div class="card-header">
+        <span class="card-title">Diagnostics</span>
+        <a href="{% url 'clinic:diagnosis_add' %}" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> Add</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Doctor</th><th>Service</th><th>Treatment</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for dx in diagnoses %}
+            <tr>
+              <td>{{ dx.created_at|date:"Y-m-d" }}</td>
+              <td>Dr. {{ dx.doctor.user.last_name }}</td>
+              <td><span class="badge badge-info">{{ dx.service|default:"—" }}</span></td>
+              <td>{{ dx.treatment|truncatechars:50|default:"—" }}</td>
+              <td>
+                <div class="actions-cell">
+                  <a href="{% url 'clinic:diagnosis_detail' pk=dx.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-eye"></i></a>
+                  <a href="{% url 'clinic:diagnosis_photos' pk=dx.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-images"></i></a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="5"><div class="empty-state"><i class="fas fa-stethoscope"></i><p>Aucun diagnostic yet</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Factures tab -->
+    <div class="tab-panel card" id="tab-invoices" style="display:none;border-top:none;border-radius:0 0 var(--radius) var(--radius)">
+      <div class="card-header"><span class="card-title">Factures</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Service</th><th>Amount</th><th>Date</th><th>Paid</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for ps in payslips %}
+            <tr>
+              <td style="font-family:monospace;font-size:12px">#{{ ps.pk }}</td>
+              <td>{{ ps.service }}</td>
+              <td style="font-weight:600">€{{ ps.amount }}</td>
+              <td>{{ ps.payment_date|date:"Y-m-d" }}</td>
+              <td>{% if ps.paid %}<span class="badge badge-success">Paid</span>{% else %}<span class="badge badge-danger">Unpaid</span>{% endif %}</td>
+              <td>
+                <div class="actions-cell">
+                  <a href="{% url 'clinic:patient_payslip_detail' pk=ps.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-eye"></i></a>
+                  <a href="{% url 'clinic:patient_payslip_pdf' pk=ps.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-download"></i></a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="6"><div class="empty-state"><i class="fas fa-file-invoice"></i><p>No invoices yet</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Rapports tab -->
+    <div class="tab-panel card" id="tab-rapports" style="display:none;border-top:none;border-radius:0 0 var(--radius) var(--radius)">
+      <div class="card-header">
+        <span class="card-title">Medical Rapports</span>
+        <a href="{% url 'clinic:rapport_add' patient_pk=patient.pk %}" class="btn btn-outline btn-sm"><i class="fas fa-upload"></i> Upload</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>File</th><th>Uploaded</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for r in rapports %}
+            <tr>
+              <td><i class="fas fa-file-pdf" style="color:var(--danger);margin-right:6px"></i>{{ r.file.name|cut:"rapports/" }}</td>
+              <td>{{ r.uploaded_at|date:"Y-m-d H:i" }}</td>
+              <td>
+                <div class="actions-cell">
+                  <a href="{% url 'clinic:rapport_view' pk=r.pk %}" class="btn btn-outline btn-sm btn-icon"><i class="fas fa-eye"></i></a>
+                  <form method="post" action="{% url 'clinic:rapport_delete' pk=r.pk %}" style="display:inline" onsubmit="return confirm('Delete this rapport?')">
+                    {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm btn-icon"><i class="fas fa-trash"></i></button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}<tr><td colspan="3"><div class="empty-state"><i class="fas fa-folder-open"></i><p>No rapports uploaded</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<style>
+  .tab-btn { padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--text-muted);margin-bottom:-2px;transition:all .15s; }
+  .tab-btn.active { color:var(--accent);border-bottom-color:var(--accent); }
+  .tab-btn:hover { color:var(--text); }
+</style>
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

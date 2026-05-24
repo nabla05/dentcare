@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Profile — {{ profile_user.get_full_name }}{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center gap-3 mb-4">
+    <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i></a>
+    <h4 class="mb-0">User Profile</h4>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card text-center p-4">
+      {% if profile_user.profile_photo %}
+      <img src="{{ profile_user.profile_photo.url }}" class="rounded-circle mx-auto mb-3"
+           width="100" height="100" style="object-fit:cover;">
+      {% else %}
+      <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:100px;height:100px;">
+        <span class="text-white fs-2 fw-bold">{{ profile_user.first_name.0 }}{{ profile_user.last_name.0 }}</span>
+      </div>
+      {% endif %}
+      <h5>{{ profile_user.get_full_name }}</h5>
+      <span class="badge bg-{% if profile_user.role == 'admin' %}danger{% elif profile_user.role == 'doctor' %}primary{% elif profile_user.role == 'receptionist' %}success{% else %}secondary{% endif %} mb-2">
+        {{ profile_user.role|title }}
+      </span>
+      <p class="text-muted small mb-0">@{{ profile_user.username }}</p>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header fw-semibold">Contact Information</div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0">
+          <tr><th style="width:35%">Email</th><td>{{ profile_user.email }}</td></tr>
+          <tr><th>Phone</th><td>{{ profile_user.phone|default:"—" }}</td></tr>
+          <tr><th>Member since</th><td>{{ profile_user.date_joined|date:"M d, Y" }}</td></tr>
+          <tr><th>Last login</th><td>{{ profile_user.last_login|date:"M d, Y H:i"|default:"—" }}</td></tr>
+        </table>
+      </div>
+    </div>
+    {% if employee %}
+    <div class="card mt-3">
+      <div class="card-header fw-semibold">Employee Information</div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0">
+          <tr><th style="width:35%">Employee ID</th><td><code>{{ employee.emp_id }}</code></td></tr>
+          <tr><th>Department</th><td>{{ employee.get_department_display }}</td></tr>
+          <tr><th>Position</th><td>{{ employee.position }}</td></tr>
+          <tr><th>Hire Date</th><td>{{ employee.hire_date }}</td></tr>
+          <tr><th>Status</th>
+            <td><span class="badge bg-{% if employee.status == 'active' %}success{% else %}secondary{% endif %}">{{ employee.get_status_display }}</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

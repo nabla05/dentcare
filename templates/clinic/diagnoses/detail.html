@@ -1,0 +1,56 @@
+{% extends "clinic/base.html" %}
+{% block title %}Détail du Diagnostic{% endblock %}
+{% block topbar_title %}Diagnosis{% endblock %}
+{% block nav_diagnoses %}active{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb"><a href="{% url 'clinic:dashboard' %}">Dashboard</a> / <a href="{% url 'clinic:diagnosis_list' %}">Diagnoses</a> / Detail</div>
+    <h1>{{ diagnosis.title }}</h1>
+  </div>
+  <div class="flex-gap">
+    <a href="{% url 'clinic:diagnosis_edit' pk=diagnosis.pk %}" class="btn btn-outline"><i class="fas fa-edit"></i> Edit</a>
+    <a href="{% url 'clinic:diagnosis_photos' pk=diagnosis.pk %}" class="btn btn-outline"><i class="fas fa-images"></i> Photos</a>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Details</span></div>
+    <div class="card-body">
+      {% for label, value in detail_rows %}
+      <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
+        <span style="color:var(--text-muted);min-width:120px">{{ label }}</span>
+        <span style="font-weight:500">{{ value|default:"—" }}</span>
+      </div>
+      {% endfor %}
+      <div style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:var(--text-muted)">Patient</span><br><strong>{{ diagnosis.patient.get_full_name }}</strong></div>
+      <div style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:var(--text-muted)">Médecin</span><br><strong>Dr. {{ diagnosis.doctor.user.get_full_name }}</strong></div>
+      <div style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:var(--text-muted)">Service</span><br><span class="badge badge-info">{{ diagnosis.service|default:"—" }}</span></div>
+      <div style="padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:var(--text-muted)">Date</span><br><strong>{{ diagnosis.created_at|date:"Y-m-d" }}</strong></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Description</span></div>
+      <div class="card-body"><p style="line-height:1.6">{{ diagnosis.description }}</p></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Traitement</span></div>
+      <div class="card-body"><p style="line-height:1.6">{{ diagnosis.treatment|default:"No treatment recorded." }}</p></div>
+    </div>
+    {% if diagnosis.payslip %}
+    <div class="card">
+      <div class="card-header"><span class="card-title">Invoice</span></div>
+      <div class="card-body" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:22px;font-weight:700">€{{ diagnosis.payslip.amount }}</div>
+          <div style="color:var(--text-muted);font-size:12px">{{ diagnosis.payslip.service }}</div>
+        </div>
+        {% if diagnosis.payslip.paid %}<span class="badge badge-success" style="font-size:13px">Paid</span>
+        {% else %}<span class="badge badge-danger" style="font-size:13px">Unpaid</span>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
